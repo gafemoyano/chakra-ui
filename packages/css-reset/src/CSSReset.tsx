@@ -1,7 +1,7 @@
 import { Global } from "@emotion/core"
-import React from "react"
+import * as React from "react"
 
-const CSSReset = () => (
+export const CSSReset = () => (
   <Global
     styles={`
       body,
@@ -24,12 +24,6 @@ const CSSReset = () => (
         box-sizing: inherit;
       }
 
-      *{
-        font-family: inherit;
-        font-size: inherit;
-        line-height: inherit;
-      }
-
       body,
       h1,
       h2,
@@ -39,6 +33,7 @@ const CSSReset = () => (
       h6,
       p,
       dl,
+      dd,
       blockquote,
       ol,
       ul {
@@ -231,6 +226,11 @@ const CSSReset = () => (
       object {
         display: block;
       }
+
+  .js-focus-visible :focus:not([data-focus-visible-added]) {
+     outline: none;
+     box-shadow: none;
+   }
     `}
   />
 )

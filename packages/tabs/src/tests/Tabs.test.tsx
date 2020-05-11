@@ -1,5 +1,5 @@
 import { axe, fireEvent, render } from "@chakra-ui/test-utils"
-import React from "react"
+import * as React from "react"
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from ".."
 
 test("should no accessibility issues", async () => {
@@ -97,7 +97,7 @@ test("selects the correct tab with keyboard navigation", () => {
 })
 
 test("focuses the correct tab with manual keyboard navigation", async () => {
-  const { getByRole, getByText, debug } = render(
+  const { getByRole, getByText } = render(
     <Tabs isManual>
       <TabList>
         <Tab>Tab 1</Tab>

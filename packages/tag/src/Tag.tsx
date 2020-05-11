@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { chakra, PropsOf } from "@chakra-ui/system"
 import { Icon, IconProps } from "@chakra-ui/icon"
 import { __DEV__ } from "@chakra-ui/utils"
@@ -6,18 +6,17 @@ import { __DEV__ } from "@chakra-ui/utils"
 export type TagProps = PropsOf<typeof Tag>
 
 /**
- * Tag
- *
  * The tag component is used to label or categorize UI elements.
  *
- * To style the element, change the styles in
- * `theme.components.Tag`
+ * To style the tag globally, change the styles in `theme.components.Tag`
+ *
+ * @see Docs https://chakra-ui/tag
  */
-
 export const Tag = chakra("span", {
   themeKey: "Tag",
   baseStyle: {
     display: "inline-flex",
+    verticalAlign: "top",
     alignItems: "center",
     maxWidth: "100%",
     fontWeight: "medium",
@@ -25,56 +24,59 @@ export const Tag = chakra("span", {
   },
 })
 
-export type TagLabelProps = PropsOf<typeof chakra.div>
+if (__DEV__) {
+  Tag.displayName = "Tag"
+}
 
-/**
- * TagLabel
- *
- * The text label of the tag
- */
+export type TagLabelProps = PropsOf<typeof TagLabel>
 
-export const TagLabel = (props: TagLabelProps) => (
-  <chakra.span
-    data-chakra-tag-label=""
-    isTruncated
-    lineHeight="1.2"
-    {...props}
-  />
+export const TagLabel = chakra("span", {
+  baseStyle: { lineHeight: 1.2 },
+})
+
+TagLabel.defaultProps = {
+  isTruncated: true,
+}
+
+if (__DEV__) {
+  TagLabel.displayName = "TagLabel"
+}
+
+export const TagLeftIcon = (props: IconProps) => (
+  <Icon verticalAlign="top" marginRight="0.5rem" {...props} />
 )
 
-/**
- * TagIcon
- *
- * The tag icon. This can be positioned on either side of the tag
- */
+if (__DEV__) {
+  TagLeftIcon.displayName = "TagLeftIcon"
+}
 
-export const TagIcon = (props: IconProps) => (
-  <Icon
-    data-chakra-tag-icon=""
-    verticalAlign="top"
-    mx="0.5rem"
-    {...props}
-    sx={{
-      "&:first-child": { marginLeft: 0 },
-      "&:last-child": { marginRight: 0 },
-    }}
-  />
+export const TagRightIcon = (props: IconProps) => (
+  <Icon verticalAlign="top" marginLeft="0.5rem" {...props} />
 )
 
-/**
- * TagCloseIcon
- *
- * The icon of the tag close button
- */
+if (__DEV__) {
+  TagRightIcon.displayName = "TagRightIcon"
+}
 
 const TagCloseIcon = (props: IconProps) => (
-  <Icon focusable="false" role="presentation" size="100%" {...props}>
+  <Icon
+    focusable="false"
+    verticalAlign="inherit"
+    role="presentation"
+    boxSize="100%"
+    viewBox="0 0 512 512"
+    {...props}
+  >
     <path
       fill="currentColor"
-      d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+      d="M289.94 256l95-95A24 24 0 00351 127l-95 95-95-95a24 24 0 00-34 34l95 95-95 95a24 24 0 1034 34l95-95 95 95a24 24 0 0034-34z"
     />
   </Icon>
 )
+
+if (__DEV__) {
+  TagCloseIcon.displayName = "TagCloseIcon"
+}
 
 export type TagCloseButtonProps = Omit<
   PropsOf<typeof chakra.button>,
@@ -83,44 +85,41 @@ export type TagCloseButtonProps = Omit<
   isDisabled?: boolean
 }
 
+const StyledButton = chakra("button", {
+  baseStyle: {
+    fontSize: "1em",
+    width: "1.25rem",
+    height: "1.25rem",
+    borderRadius: "sm",
+    marginLeft: "0.375rem",
+    marginRight: "-1",
+    display: "flex",
+    alignItems: "center",
+    transition: "all 0.2s",
+    opacity: 0.5,
+    _disabled: { opacity: 0.4 },
+    outline: "0",
+    _focus: {
+      boxShadow: "outline",
+      bg: "rgba(0, 0, 0, 0.14)",
+    },
+    _hover: { opacity: 0.8 },
+    _active: { opacity: 1 },
+  },
+})
+
 /**
  * TagCloseButton
  *
  * The tag close button. This is used to close "remove" the tag
+ *
+ * @see Docs https://chakra-ui/tag
  */
-
 export const TagCloseButton = (props: TagCloseButtonProps) => {
-  const {
-    isDisabled,
-    children = <TagCloseIcon verticalAlign="inherit" />,
-    ...rest
-  } = props
-  return (
-    <chakra.button
-      fontSize="1em"
-      size="1em"
-      borderRadius="sm"
-      marginLeft="6px"
-      display="flex"
-      alignItems="center"
-      _disabled={{ opacity: 0.4 }}
-      outline="0"
-      _focus={{
-        boxShadow: "outline",
-        bg: "rgba(0, 0, 0, 0.14)",
-      }}
-      _hover={{ opacity: 0.8 }}
-      _active={{ opacity: 1 }}
-      disabled={isDisabled}
-      children={children}
-      {...rest}
-    />
-  )
+  const { isDisabled, children = <TagCloseIcon />, ...rest } = props
+  return <StyledButton disabled={isDisabled} children={children} {...rest} />
 }
 
 if (__DEV__) {
-  Tag.displayName = "Tag"
-  TagIcon.displayName = "TagIcon"
-  TagLabel.displayName = "TagLabel"
   TagCloseButton.displayName = "TagCloseButton"
 }

@@ -1,15 +1,8 @@
 import * as React from "react"
-import { useColorMode, ColorModeProvider } from "./ColorModeProvider"
+import { useColorMode } from "./ColorModeProvider"
 
 export default {
   title: "Color Mode",
-  decorators: [
-    (StoryFn: any) => (
-      <ColorModeProvider>
-        <StoryFn />
-      </ColorModeProvider>
-    ),
-  ],
 }
 
 export const BasicExample = () => {

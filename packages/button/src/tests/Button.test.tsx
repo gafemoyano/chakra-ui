@@ -11,8 +11,8 @@ test("Button renders correctly", () => {
 test("Button renders with icons", () => {
   const { asFragment } = render(
     <ButtonGroup>
-      <Button leftIcon={EmailIcon}>Email</Button>
-      <Button rightIcon={ArrowForwardIcon}>Arrow Forward</Button>
+      <Button leftIcon={<EmailIcon />}>Email</Button>
+      <Button rightIcon={<ArrowForwardIcon />}>Arrow Forward</Button>
     </ButtonGroup>,
   )
   expect(asFragment()).toMatchSnapshot()
@@ -51,9 +51,9 @@ test("has the proper aria attributes", () => {
 
   // isLoading sets aria-disabled="true"
   rerender(<Button isLoading>Hello</Button>)
-  expect(button).toHaveAttribute("aria-disabled", "true")
+  expect(button).toHaveAttribute("data-loading", "")
 
   // isDisabled sets aria-disabled="true"
   rerender(<Button isDisabled>Hello</Button>)
-  expect(button).toHaveAttribute("aria-disabled", "true")
+  expect(button).toHaveAttribute("disabled", "")
 })

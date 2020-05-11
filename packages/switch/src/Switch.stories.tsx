@@ -1,5 +1,5 @@
 import { chakra } from "@chakra-ui/system"
-import React from "react"
+import * as React from "react"
 import { Switch } from "."
 
 export default {
@@ -81,7 +81,7 @@ export const Sizes = () => {
  */
 
 export const Controlled = () => {
-  const [value, setValue] = React.useState(false)
+  const [value, setValue] = React.useState(true)
 
   return (
     <Switch

@@ -1,19 +1,30 @@
+import { __DEV__ } from "@chakra-ui/utils"
 import * as React from "react"
 import { Button, ButtonProps } from "./Button"
-import Icon from "@chakra-ui/icon"
+import { forwardRef, Ref, isValidElement, cloneElement } from "react"
 
 export type IconButtonProps = Omit<
   ButtonProps,
   "leftIcon" | "isFullWidth" | "rightIcon" | "loadingText"
 > & {
-  icon?: React.ElementType
+  icon?: React.ReactElement
   isRound?: boolean
   "aria-label": string
 }
 
-export const IconButton = React.forwardRef(
-  (props: IconButtonProps, ref: React.Ref<any>) => {
-    const { icon, isRound, "aria-label": ariaLabel, ...rest } = props
+export const IconButton = forwardRef(
+  (props: IconButtonProps, ref: Ref<any>) => {
+    const { icon, children, isRound, "aria-label": ariaLabel, ...rest } = props
+
+    /**
+     * Passing the icon as prop or children should work
+     */
+    const btnIcon = icon || children
+
+    const a11yProps = {
+      "aria-hidden": true,
+      focusable: false,
+    }
 
     return (
       <Button
@@ -23,11 +34,12 @@ export const IconButton = React.forwardRef(
         aria-label={ariaLabel}
         {...rest}
       >
-        <Icon aria-hidden focusable="false" as={icon} />
+        {isValidElement(btnIcon) ? cloneElement(btnIcon, a11yProps) : null}
       </Button>
     )
   },
 )
 
-IconButton.displayName = "IconButton"
-IconButton.defaultProps = Button.defaultProps
+if (__DEV__) {
+  IconButton.displayName = "IconButton"
+}

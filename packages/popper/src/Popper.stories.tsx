@@ -1,5 +1,5 @@
 import { useDisclosure } from "@chakra-ui/hooks"
-import React from "react"
+import * as React from "react"
 import { usePopper } from "."
 
 export default {
@@ -31,6 +31,42 @@ export const Basic = () => {
         <div {...arrow} style={{ ...arrow.style, background: "inherit" }} />
         Popper
       </div>
+    </>
+  )
+}
+
+export const Conditional = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const { popper, reference, arrow } = usePopper({
+    placement: "bottom-start",
+    forceUpdate: isOpen,
+  })
+
+  return (
+    <>
+      <button
+        onMouseOver={onOpen}
+        onMouseLeave={onClose}
+        style={{ margin: 40 }}
+        {...reference}
+      >
+        Reference
+      </button>
+      {isOpen && (
+        <div
+          {...popper}
+          style={{
+            ...popper.style,
+            background: "red",
+            padding: 15,
+            minWidth: 200,
+          }}
+        >
+          <div {...arrow} style={{ ...arrow.style, background: "inherit" }} />
+          Popper
+        </div>
+      )}
     </>
   )
 }

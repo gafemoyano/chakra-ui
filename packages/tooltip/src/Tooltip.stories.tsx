@@ -3,6 +3,7 @@ import * as React from "react"
 import { Tooltip, useTooltip } from "."
 import { Transition } from "@chakra-ui/transition"
 import { Portal } from "@chakra-ui/portal"
+import { Modal, ModalContent, ModalOverlay } from "@chakra-ui/modal"
 
 export default {
   title: "Tooltip",
@@ -124,7 +125,7 @@ export const WithTransition = () => (
 )
 
 export const withButton = () => (
-  <Tooltip label="This is a chakra tooltip">
+  <Tooltip label="This is a chakra tooltip" placement="top">
     <button>Hover me</button>
   </Tooltip>
 )
@@ -146,6 +147,71 @@ export const withAriaLabel = () => (
         🔔
       </span>
       <span>3</span>
+    </button>
+  </Tooltip>
+)
+
+export const issue607 = () => (
+  <div
+    style={{
+      position: "fixed",
+      background: "red",
+      height: "100px",
+      width: "200px",
+    }}
+  >
+    <Tooltip label="Hello" aria-label="hello">
+      Hi
+    </Tooltip>
+  </div>
+)
+
+export const WithModal = () => {
+  const [showDialog, setShowDialog] = React.useState(false)
+  return (
+    <div>
+      <button onClick={() => setShowDialog(true)}>Show Dialog</button>
+      <Modal isOpen={showDialog} onClose={() => setShowDialog(false)}>
+        <ModalOverlay>
+          <ModalContent height="300px">
+            <div>
+              <button onClick={() => setShowDialog(false)}>Close Dialog</button>
+              <Tooltip label="Notifications">
+                <button style={{ fontSize: 25 }}>
+                  <span aria-hidden>🔔</span>
+                </button>
+              </Tooltip>
+              <Tooltip label="Settings">
+                <button style={{ fontSize: 25 }}>
+                  <span aria-hidden>⚙️</span>
+                </button>
+              </Tooltip>
+              <Tooltip label="Your files are safe with us">
+                <button style={{ fontSize: 25 }}>
+                  <span aria-hidden>💾</span> Save
+                </button>
+              </Tooltip>
+
+              <div style={{ float: "right" }}>
+                <Tooltip label="Notifications" aria-label="3 Notifications">
+                  <button style={{ fontSize: 25 }}>
+                    <span>🔔</span>
+                    <span>3</span>
+                  </button>
+                </Tooltip>
+              </div>
+            </div>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+    </div>
+  )
+}
+
+export const withDisabledButton = () => (
+  <Tooltip label="Oh oh oh, oh oh">
+    <button style={{ fontSize: 25, pointerEvents: "all" }} disabled>
+      Can't Touch This
     </button>
   </Tooltip>
 )

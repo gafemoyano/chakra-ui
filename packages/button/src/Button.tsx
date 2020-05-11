@@ -1,8 +1,21 @@
-import { Icon } from "@chakra-ui/icon"
-import { chakra, PropsOf, SystemProps } from "@chakra-ui/system"
-import * as React from "react"
 import { Spinner } from "@chakra-ui/spinner"
-import { dataAttr } from "@chakra-ui/utils"
+import {
+  chakra,
+  PropsOf,
+  SystemProps,
+  useComponentStyle,
+  pseudoSelectors,
+} from "@chakra-ui/system"
+import { dataAttr, __DEV__, merge, Dict, cx } from "@chakra-ui/utils"
+import * as React from "react"
+import {
+  forwardRef,
+  ReactElement,
+  Ref,
+  cloneElement,
+  isValidElement,
+} from "react"
+import { useButtonGroup } from "./ButtonGroup"
 
 const StyledButton = chakra("button", {
   themeKey: "Button",
@@ -48,84 +61,156 @@ export interface ButtonOptions {
   type?: "button" | "reset" | "submit"
   /**
    * If added, the button will show an icon before the button's label.
-   * Use the icon key in `theme.iconPath`
    */
-  leftIcon?: React.ElementType
+  leftIcon?: ReactElement
   /**
    * If added, the button will show an icon after the button's label.
-   * Use the icon key in `theme.iconPath`
    */
-  rightIcon?: React.ElementType
+  rightIcon?: ReactElement
   /**
    * The space between the button icon and label.
-   * Use the styled-system tokens or add custom values as a string
    */
   iconSpacing?: SystemProps["marginRight"]
   /**
    * Replace the spinner component when `isLoading` is set to `true`
    */
-  spinner?: React.ReactElement
+  spinner?: ReactElement
 }
 
 export type ButtonProps = Omit<PropsOf<typeof StyledButton>, "disabled"> &
   ButtonOptions
 
-export const Button = React.forwardRef(
-  (props: ButtonProps, ref: React.Ref<any>) => {
-    const {
-      isDisabled,
-      isLoading,
-      isActive,
-      isFullWidth,
-      children,
-      leftIcon,
-      rightIcon,
-      loadingText,
-      iconSpacing = "0.5rem",
-      type = "button",
-      spinner,
-      ...rest
-    } = props
+export const Button = forwardRef((props: ButtonProps, ref: Ref<any>) => {
+  const group = useButtonGroup()
 
-    return (
-      <StyledButton
-        disabled={isDisabled || isLoading}
-        aria-disabled={isDisabled || isLoading}
-        ref={ref}
-        type={type}
-        width={isFullWidth ? "100%" : undefined}
-        data-active={dataAttr(isActive)}
-        data-loading={dataAttr(isLoading)}
-        {...rest}
-      >
-        {leftIcon && !isLoading && (
-          <Icon
-            marginLeft={-1}
-            marginRight={iconSpacing as any}
-            as={leftIcon}
-          />
-        )}
-        {isLoading && (
-          <chakra.span
-            position={loadingText ? "relative" : "absolute"}
-            marginRight={loadingText ? iconSpacing : 0}
-          >
-            {spinner || <Spinner color="currentColor" size="1em" />}
-          </chakra.span>
-        )}
-        {isLoading
-          ? loadingText || <chakra.span opacity={0}>{children}</chakra.span>
-          : children}
-        {rightIcon && !isLoading && (
-          <Icon
-            marginRight={-1}
-            marginLeft={iconSpacing as any}
-            as={rightIcon}
-          />
-        )}
-      </StyledButton>
-    )
-  },
-)
+  const {
+    isDisabled,
+    isLoading,
+    isActive,
+    isFullWidth,
+    children,
+    leftIcon,
+    rightIcon,
+    loadingText,
+    iconSpacing = "0.5rem",
+    type = "button",
+    spinner,
+    variant = group?.variant,
+    colorScheme = group?.colorScheme,
+    size = group?.size,
+    className,
+    ...rest
+  } = props
 
-Button.displayName = "Button"
+  const styles = useComponentStyle({
+    themeKey: "Button",
+    variant,
+    size,
+    colorScheme,
+  }) as Dict
+
+  /**
+   * When button is used within ButtonGroup (i.e flushed with sibling buttons),
+   * it's important to add a `zIndex` when it's focused to it doesn't look funky.
+   *
+   * So let's read the component styles and then add `zIndex` to it.
+   */
+  const focusSelector = pseudoSelectors["_focus"]
+  const _focus = merge(styles?.[focusSelector] ?? {}, { zIndex: 1 })
+
+  const _className = cx("chakra-button", className)
+
+  return (
+    <StyledButton
+      disabled={isDisabled || isLoading}
+      ref={ref}
+      type={type}
+      width={isFullWidth ? "100%" : undefined}
+      data-active={dataAttr(isActive)}
+      data-loading={dataAttr(isLoading)}
+      variant={variant}
+      colorScheme={colorScheme}
+      size={size}
+      className={_className}
+      {...(!!group && { _focus })}
+      {...rest}
+    >
+      {leftIcon && !isLoading && (
+        <ButtonIcon ml={-1} mr={iconSpacing} children={leftIcon} />
+      )}
+      {isLoading && (
+        <ButtonSpinner
+          spacing={iconSpacing}
+          label={loadingText}
+          children={spinner}
+        />
+      )}
+      {isLoading
+        ? loadingText || <chakra.span opacity={0} children={children} />
+        : children}
+      {rightIcon && !isLoading && (
+        <ButtonIcon ml={iconSpacing} mr={-1} children={rightIcon} />
+      )}
+    </StyledButton>
+  )
+})
+
+if (__DEV__) {
+  Button.displayName = "Button"
+}
+
+const ButtonIcon = (props: PropsOf<typeof chakra.span>) => {
+  const a11yProps = {
+    "aria-hidden": true,
+    focusable: false,
+  }
+
+  const children = isValidElement(props.children)
+    ? cloneElement(props.children, a11yProps)
+    : props.children
+
+  return (
+    <chakra.span
+      className="chakra-button__icon"
+      {...props}
+      children={children}
+    />
+  )
+}
+
+if (__DEV__) {
+  ButtonIcon.displayName = "ButtonIcon"
+}
+
+type ButtonSpinnerProps = PropsOf<typeof chakra.div> & {
+  label?: string
+  spacing?: SystemProps["margin"]
+}
+
+const ButtonSpinner = (props: ButtonSpinnerProps) => {
+  const {
+    label,
+    spacing,
+    children = <Spinner color="currentColor" width="1em" height="1em" />,
+    className,
+    ...rest
+  } = props
+
+  const _className = cx("chakra-button__spinner", className)
+
+  return (
+    <chakra.div
+      fontSize="1em"
+      lineHeight="normal"
+      position={label ? "relative" : "absolute"}
+      mr={label ? spacing : 0}
+      className={_className}
+      {...rest}
+      children={children}
+    />
+  )
+}
+
+if (__DEV__) {
+  ButtonSpinner.displayName = "ButtonSpinner"
+}

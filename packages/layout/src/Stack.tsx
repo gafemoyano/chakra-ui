@@ -1,10 +1,4 @@
-import {
-  chakra,
-  css,
-  PropsOf,
-  Responsive,
-  SystemProps,
-} from "@chakra-ui/system"
+import { chakra, css, Prop, PropsOf, SystemProps } from "@chakra-ui/system"
 import {
   Dict,
   getValidChildren,
@@ -14,7 +8,7 @@ import {
 import React, { cloneElement, forwardRef } from "react"
 import { FlexOptions } from "./Flex"
 
-export type StackDirection = Responsive<"row" | "column">
+export type StackDirection = Prop<"row" | "column">
 
 type StackOptions = Pick<FlexOptions, "align" | "justify" | "wrap"> & {
   /**
@@ -40,10 +34,10 @@ export const StackDivider = chakra("hr", {
 })
 
 /**
- * Stack
+ * Stacks help you easily create flexible and automatically distributed layouts
  *
- * Used to stack elements in the horizontal or vertical direction,
- * and apply a space or/and divider between each child.
+ * You can stack elements in the horizontal or vertical direction,
+ * and apply a space or/and divider between each element.
  *
  * It uses `display: flex` internally and renders a `div`.
  *
@@ -53,21 +47,23 @@ export const StackDivider = chakra("hr", {
 export const Stack = forwardRef((props: StackProps, ref: React.Ref<any>) => {
   const {
     direction = "column",
-    justify = "flex-start",
-    align,
-    spacing = 2,
+    align = "flex-start",
+    justify,
+    spacing = "0.5rem",
     wrap,
     children,
     divider,
     ...rest
   } = props
 
+  /**
+   * If we ever run into SSR issues with this, check this post to find a fix for it:
+   * @see https://medium.com/@emmenko/patching-lobotomized-owl-selector-for-emotion-ssr-5a582a3c424c
+   */
   const selector = "> * + *"
 
   const styles = {
-    flexDirection: mapResponsive(direction, value =>
-      value === "row" ? "row" : "column",
-    ),
+    flexDirection: direction,
     [selector]: mapResponsive(direction, value => ({
       [value === "column" ? "marginTop" : "marginLeft"]: spacing,
       [value === "column" ? "marginLeft" : "marginTop"]: 0,
@@ -116,7 +112,7 @@ export const Stack = forwardRef((props: StackProps, ref: React.Ref<any>) => {
     return child
   })
 
-  const getStyle = (theme: Dict) => {
+  const sx = (theme: Dict) => {
     if (hasDivider) return undefined
     return css({ [selector]: styles[selector] })(theme)
   }
@@ -129,7 +125,7 @@ export const Stack = forwardRef((props: StackProps, ref: React.Ref<any>) => {
       justifyContent={justify}
       flexDirection={styles.flexDirection}
       flexWrap={wrap}
-      sx={getStyle as any}
+      sx={sx as any}
       {...rest}
     >
       {clones}
